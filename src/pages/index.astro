@@ -1,202 +1,57 @@
-
 ---
-import '../styles/global.css';
-import { gamesData } from '../data/games';
-import GameCard from '../components/ui/GameCard.astro';
-import Modal from '../components/Modal.astro';
+import AppLayout from '../components/ui/AppLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Field from '../components/ui/Field.astro';
+import { getToken } from '../client/api';
 
-// Подготавливаем карту жанров для быстрой фильтрации на Alpine.js
-const alpineGamesMap = gamesData.map(g => ({
-    id: g.id,
-    genres: g.genres.map(genre => genre.toLowerCase())
-}));
-
-const allGenres = [
-    { id: "action", label: "Action" },
-    { id: "adventure", label: "Adventure" },
-    { id: "rpg", label: "RPG" },
-    { id: "strategy", label: "Strategy" },
-    { id: "puzzle", label: "Puzzle" },
-    { id: "simulation", label: "Simulation" },
-    { id: "sports", label: "Sports" },
-    { id: "racing", label: "Racing" },
-    { id: "horror", label: "Horror" },
-    { id: "casual", label: "Casual" }
-];
+// Если токен уже есть, редиректим на /app
+if (getToken()) {
+  return Astro.redirect('/app');
+}
 ---
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GameHub - персонализированные рекомендации игр для игроков и аналитические инструменты для разработчиков">
-    <meta property="og:title" content="GameHub - Найдите свою идеальную игру">
-    <meta property="og:description" content="Персонализированные рекомендации игр на основе ваших предпочтений">
-    <meta property="og:type" content="website">
-    <title>GameHub - Explore</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="logo-container">
-                <img src="https://image.qwenlm.ai/public_source/efde04de-8f99-4dab-98c0-32e6925f6494/15bbac074-c573-4699-9c94-60aeb9bdb793.png" alt="GameHub Logo" class="logo-img">
-                <span class="logo-text">GameHub</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="#" class="nav-link active">Explore</a></li>
-                <li><a href="#" class="nav-link disabled" aria-disabled="true">Preferences</a></li>
-                <li><a href="#" class="nav-link disabled" aria-disabled="true">Profile</a></li>
-            </ul>
-            <button class="auth-button">Войти / Регистрация</button>
+<AppLayout pageType="auth" title="PlayNext | Sign In">
+  <div class="auth-layout">
+    <section class="auth-hero">
+      <div class="brand-badge">PlayNext</div>
+      <h1>Find your next favorite game.</h1>
+      <p>
+        Discover games that match your mood, save favorite genres,
+        rate titles, and share your opinion with other players.
+      </p>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="tabs">
+          <button class="tab-button active" data-auth-tab="login" type="button">Sign In</button>
+          <button class="tab-button" data-auth-tab="register" type="button">Register</button>
         </div>
-    </header>
 
-    <!-- Main Content with Alpine.js logic -->
-    <main class="container" x-data={`{
-        selectedGenres: [],
-        isLoading: false,
-        visibleIds: 'all',
-        allGames: ${JSON.stringify(alpineGamesMap)},
-        applyFilters() {
-            if (this.selectedGenres.length === 0) return;
-            this.isLoading = true;
-            this.visibleIds = []; // Временно скрываем все игры
-
-            setTimeout(() => {
-                this.visibleIds = this.allGames
-                    .filter(game => this.selectedGenres.some(genre => game.genres.includes(genre)))
-                    .map(game => game.id);
-
-                this.isLoading = false;
-                document.getElementById('recommendations-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 800);
-        }
-    }`}>
-        <!-- Filters Section -->
-        <section class="section">
-            <h1 class="section-title">Найдите идеальную игру</h1>
-            <p class="section-subtitle">Выберите жанры, которые вам интересны</p>
-
-            <div class="filters-container">
-                <div class="genres-grid">
-                    {allGenres.map((genre) => (
-                        <label class="genre-checkbox" :class={`selectedGenres.includes('${genre.id}') ? 'selected' : ''`}>
-                            <input type="checkbox" value={genre.id} x-model="selectedGenres" class="genre-input">
-                            <span class="genre-label">{genre.label}</span>
-                        </label>
-                    ))}
-                </div>
-
-                <div class="filters-actions">
-                    <button class="apply-button" :disabled="selectedGenres.length === 0" @click="applyFilters()">
-                        Применить фильтры
-                    </button>
-                    <a href="#" class="advanced-link" @click.prevent="$dispatch('open-modal')">Расширенные настройки</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Recommendations Section -->
-        <section class="section" id="recommendations-section">
-            <h2 class="section-title">Рекомендуемые игры</h2>
-            <p class="section-subtitle">На основе выбранных жанров</p>
-
-            <div class="loading" :class="isLoading ? 'active' : ''">
-                <div class="spinner"></div>
-                <p class="loading-text">Загрузка рекомендаций...</p>
-            </div>
-
-            <div class="recommendations-grid" x-show="!isLoading">
-                {gamesData.map((game) => (
-                    <div style="display: none;" x-show={`visibleIds === 'all' || visibleIds.includes(${game.id})`}>
-                        <GameCard game={game} />
-                    </div>
-                ))}
-
-                <!-- Сообщение, если ничего не найдено -->
-                <div class="no-results" style="display: none;" x-show="visibleIds !== 'all' && visibleIds.length === 0">
-                    <h3 class="no-results-title">К сожалению, игр по выбранным жанрам не найдено</h3>
-                    <p class="no-results-text">Попробуйте выбрать другие жанры или сбросить фильтры.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta-section">
-            <h2 class="cta-title">Хотите персонализированные рекомендации?</h2>
-            <p class="cta-subtitle">Присоединяйтесь к сообществу GameHub и получайте идеальные рекомендации игр специально для вас</p>
-            <div class="benefits-list">
-                <div class="benefit-item">
-                    <span class="benefit-check">✓</span>
-                    <span>Точные рекомендации на основе ваших оценок</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-check">✓</span>
-                    <span>Возможность сохранять любимые игры</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-check">✓</span>
-                    <span>Получать уведомления о новых релевантных играх</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-check">✓</span>
-                    <span>Участвовать в сообществе игроков</span>
-                </div>
-            </div>
-            <button class="register-button">Зарегистрироваться бесплатно</button>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-container">
-                <div class="footer-column">
-                    <h3>GameHub</h3>
-                    <p style="color: var(--gray-300); margin-top: var(--spacing-sm); line-height: 1.6;">
-                        Платформа для игроков и разработчиков игр. Персонализированные рекомендации и аналитические инструменты.
-                    </p>
-                </div>
-                <div class="footer-column">
-                    <h3>Навигация</h3>
-                    <ul class="footer-links">
-                        <li><a href="#" class="footer-link">Explore</a></li>
-                        <li><a href="#" class="footer-link disabled" aria-disabled="true">Preferences</a></li>
-                        <li><a href="#" class="footer-link disabled" aria-disabled="true">Profile</a></li>
-                        <li><a href="#" class="footer-link">О платформе</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Социальные сети</h3>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Facebook">f</a>
-                        <a href="#" class="social-link" aria-label="Twitter">t</a>
-                        <a href="#" class="social-link" aria-label="Instagram">i</a>
-                        <a href="#" class="social-link" aria-label="Discord">d</a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Контакты</h3>
-                    <ul class="footer-links">
-                        <li><a href="mailto:support@gamehub.com" class="footer-link">support@gamehub.com</a></li>
-                        <li><a href="tel:+74951234567" class="footer-link">+7 (495) 123-45-67</a></li>
-                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
-                        <li><a href="#" class="footer-link">Пользовательское соглашение</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2026 GameHub. Все права защищены.</p>
-            </div>
+        <div class="auth-copy">
+          <h2 id="authTitle">Welcome back</h2>
+          <p id="authSubtitle">Use your email and password to enter PlayNext.</p>
         </div>
-    </footer>
 
-    <!-- Вызов модального окна -->
-    <Modal />
-</body>
-</html>
+        <form id="loginForm" class="auth-form">
+          <Field type="email" name="email" label="Email" placeholder="your@email.com" required />
+          <Field type="password" name="password" label="Password" placeholder="Minimum 6 characters" required />
+          <Button variant="primary" type="submit" class="auth-submit">Sign In</Button>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <Field type="text" name="username" label="Username" placeholder="Choose a username" minlength={3} required />
+          <Field type="email" name="email" label="Email" placeholder="your@email.com" required />
+          <Field type="password" name="password" label="Password" placeholder="Minimum 6 characters" minlength={6} required />
+          <Button variant="primary" type="submit" class="auth-submit">Create Account</Button>
+        </form>
+
+        <p class="auth-note">
+          Sign in to manage your profile, preferences, ratings, and reviews.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="../client/auth.ts"></script>
+</AppLayout>

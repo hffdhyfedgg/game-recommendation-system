@@ -1,0 +1,60 @@
+---
+import AppLayout from '../../components/ui/AppLayout.astro';
+import SectionCard from '../../components/ui/SectionCard.astro';
+import Button from '../../components/ui/Button.astro';
+import Field from '../../components/ui/Field.astro';
+import { requireAuth } from '../../client/api';
+
+const { id } = Astro.params;
+---
+
+<AppLayout pageType="game" title="PlayNext | Game">
+  <main class="page-shell details-shell" data-game-id={id}>
+    <a class="back-link" href="/app">&larr; Back to catalog</a>
+
+    <section class="game-hero-card">
+      <div class="game-hero-inner">
+        <img class="details-cover" id="gameCover" src="" alt="" />
+        <div>
+          <span class="eyebrow" id="gameGenres"></span>
+          <h1 class="game-title" id="gameTitle"></h1>
+          <p class="game-subtitle" id="gameSubtitle"></p>
+          <div class="details-meta">
+            <div class="stat-item">
+              <strong id="gameAvgRating">-</strong>
+              <span>Avg rating</span>
+            </div>
+            <div class="stat-item">
+              <strong id="gameReviewsCount">-</strong>
+              <span>Reviews</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="two-column">
+      <SectionCard title="Your review" subtitle="Rate this game and share your opinion with other players.">
+        <form id="reviewForm" class="stack-form">
+          <div class="star-picker" id="starPicker">
+            <button class="star-button" type="button" data-star="1">★</button>
+            <button class="star-button" type="button" data-star="2">★</button>
+            <button class="star-button" type="button" data-star="3">★</button>
+            <button class="star-button" type="button" data-star="4">★</button>
+            <button class="star-button" type="button" data-star="5">★</button>
+          </div>
+          <input type="hidden" name="rating" id="ratingInput" />
+          <Field type="textarea" name="text" label="Your review" placeholder="Share your thoughts about this game..." required />
+          <Button variant="primary" type="submit">Submit Review</Button>
+        </form>
+      </SectionCard>
+
+      <SectionCard title="Community reviews" subtitle="Read what other players think about this game." id="reviewsContainer">
+        <div id="reviewsList" class="reviews-list"></div>
+        <div id="reviewsEmpty" class="empty-state hidden">No reviews yet. Be the first to share your opinion!</div>
+      </SectionCard>
+    </div>
+  </main>
+
+  <script type="module" src="../../client/game.ts"></script>
+</AppLayout>

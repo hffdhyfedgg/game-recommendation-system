@@ -1,0 +1,117 @@
+---
+import AppLayout from '../components/ui/AppLayout.astro';
+import SectionCard from '../components/ui/SectionCard.astro';
+import Button from '../components/ui/Button.astro';
+import Field from '../components/ui/Field.astro';
+import Modal from '../components/ui/Modal.astro';
+import { requireAuth } from '../client/api';
+
+// Проверка авторизации на сервере (опционально)
+// requireAuth();
+---
+
+<AppLayout pageType="app" title="PlayNext | App">
+  <main class="page-shell app-shell">
+    <!-- Explore Panel -->
+    <section class="panel active" data-panel="explore">
+      <div class="hero-strip">
+        <div>
+          <p class="eyebrow">Explore</p>
+          <h1>Recommended games for your next session</h1>
+          <p class="hero-text">
+            Browse curated recommendations, open game pages, rate titles, and read community reviews.
+          </p>
+        </div>
+        <div class="hero-strip-side">
+          <Field type="search" name="search" id="searchInput" placeholder="Search by title or genre" />
+        </div>
+      </div>
+
+      <SectionCard title="Game Catalog" subtitle="Popular titles sorted by community rating." id="gamesGridContainer">
+        <div id="gamesGrid" class="games-grid"></div>
+        <div id="gamesEmpty" class="empty-state hidden">No games match your current search.</div>
+      </SectionCard>
+    </section>
+
+    <!-- Preferences Panel -->
+    <section class="panel" data-panel="preferences">
+      <div class="hero-strip compact">
+        <div>
+          <p class="eyebrow">Preferences</p>
+          <h1>Choose the genres you want to see first</h1>
+          <p class="hero-text">
+            Save favorite genres so PlayNext can highlight games closer to your taste.
+          </p>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <SectionCard title="Favorite Genres" subtitle="Pick one or several genres and save your preferences.">
+          <div slot="actions">
+            <Button variant="primary" id="saveGenresButton" type="button">Save Genres</Button>
+          </div>
+          <div id="genresGrid" class="genres-grid"></div>
+        </SectionCard>
+
+        <SectionCard title="Favorite Games" subtitle="Games with your personal rating of 5 stars appear here.">
+          <div id="favoriteGamesGrid" class="games-grid compact-grid"></div>
+          <div id="favoritesEmpty" class="empty-state hidden">
+            Your favorite games list is still empty. Rate a game with 5 stars to add it here.
+          </div>
+        </SectionCard>
+      </div>
+    </section>
+
+    <!-- Profile Panel -->
+    <section class="panel" data-panel="profile">
+      <div class="hero-strip compact">
+        <div>
+          <p class="eyebrow">Profile</p>
+          <h1>Your PlayNext player profile</h1>
+          <p class="hero-text">
+            Manage your account and keep track of your ratings, reviews, and favorites.
+          </p>
+        </div>
+      </div>
+
+      <div class="profile-layout">
+        <section class="section-card profile-card">
+          <div class="profile-top">
+            <div class="avatar" id="profileAvatar">P</div>
+            <div>
+              <h2 id="profileUsername">Loading...</h2>
+              <p id="profileEmail">Loading...</p>
+              <span class="role-badge">Player</span>
+            </div>
+          </div>
+
+          <div class="profile-meta">
+            <div class="meta-row">
+              <span>Registration date</span>
+              <strong id="profileCreatedAt">-</strong>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <Button variant="secondary" id="openPasswordModal" type="button">Change Password</Button>
+            <Button variant="danger" id="deleteAccountButton" type="button">Delete Account</Button>
+          </div>
+        </section>
+
+        <SectionCard title="Player Stats" subtitle="A quick overview of your ratings, reviews, and saved preferences.">
+          <div class="stats-grid" id="statsGrid"></div>
+        </SectionCard>
+      </div>
+    </section>
+  </main>
+
+  <Modal id="passwordModal" title="Change password">
+    <form id="passwordForm" class="stack-form">
+      <Field type="password" name="currentPassword" label="Current password" minlength={6} required />
+      <Field type="password" name="newPassword" label="New password" minlength={6} required />
+      <Button variant="primary" type="submit">Update Password</Button>
+    </form>
+  </Modal>
+
+  <script type="module" src="../client/app.ts"></script>
+</AppLayout>

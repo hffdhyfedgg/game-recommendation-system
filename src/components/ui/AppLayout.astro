@@ -1,0 +1,58 @@
+---
+export interface Props {
+  pageType: 'auth' | 'app' | 'game';
+  title: string;
+}
+
+import '../styles/global.css';
+import Toast from './Toast.astro';
+
+const { pageType, title } = Astro.props;
+const bodyClass = pageType === 'auth' ? 'auth-body' : 'app-body';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class={bodyClass}>
+    {pageType !== 'auth' && (
+      <header class="site-header">
+        <div class="page-shell header-shell">
+          <a class="brand" href="/app.astro">
+            <span class="brand-mark">P</span>
+            <div>
+              <strong>PlayNext</strong>
+              <small>{pageType === 'game' ? 'Game details' : 'Game recommendations'}</small>
+            </div>
+          </a>
+
+          <nav class="main-nav">
+            <a class="nav-link" href="/app.astro">Explore</a>
+            <a class="nav-link" href="/app.astro#preferences">Preferences</a>
+            <a class="nav-link" href="/app.astro#profile">Profile</a>
+          </nav>
+
+          <div class="header-actions">
+            <div class="user-pill" id="headerUser">Loading...</div>
+            <button class="ghost-button" id="logoutButton" type="button">Log Out</button>
+          </div>
+        </div>
+      </header>
+    )}
+
+    <slot />
+
+    <Toast />
+    <slot name="scripts" />
+  </body>
+</html>

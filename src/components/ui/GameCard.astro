@@ -1,37 +1,57 @@
 
 ---
 export interface Props {
-    game: {
-        id: number;
-        title: string;
-        description: string;
-        genres: string[];
-        rating: number;
-        image: string;
-    };
+  game: {
+    id: number;
+    title: string;
+    short_description: string;
+    cover_path: string;
+    genres: string[];
+    average_rating: number;
+    reviews_count: number;
+    recommended_score?: number;
+    my_rating?: number | null;
+  };
 }
 
 const { game } = Astro.props;
 
-const stars = Math.floor(game.rating);
-const halfStar = game.rating % 1 >= 0.5;
-const emptyStars = 5 - stars - (halfStar ? 1 : 0);
+function stars(value: number): string {
+  return `${value}/5`;
+}
+
+const matchBadge =
+  game.recommended_score && game.recommended_score > 0
+    ? `<span class="match-badge">Match ${game.recommended_score}</span>`
+    : "";
+
+const myRating =
+  game.my_rating !== null && game.my_rating !== undefined
+    ? `<span class="meta-muted">Your rating: ${stars(game.my_rating)}</span>`
+    : `<span class="meta-muted">No personal rating yet</span>`;
 ---
 
-<div class="game-card">
-    <img src={game.image} alt={game.title} class="game-cover" loading="lazy">
-    <div class="game-content">
-        <h3 class="game-title">{game.title}</h3>
-        <p class="game-description">{game.description}</p>
-        <div class="game-genres">
-            {game.genres.map(genre => <span class="genre-tag">{genre}</span>)}
-        </div>
-        <div class="rating-container">
-            {[...Array(stars)].map(() => <span class="star">★</span>)}
-            {halfStar && <span class="star">★</span>}
-            {[...Array(emptyStars)].map(() => <span class="star" style="color: var(--gray-300);">★</span>)}
-            <span class="rating-text">{game.rating.toFixed(1)}</span>
-        </div>
-        <a href="#" class="details-button">Подробнее</a>
+<article class="game-card">
+  <img src={game.cover_path} alt={game.title} />
+  <div class="game-card-body">
+    {game.recommended_score && game.recommended_score > 0 && (
+      <span class="match-badge">Match {game.recommended_score}</span>
+    )}
+    <h3>{game.title}</h3>
+    <p>{game.short_description}</p>
+    <div class="genres-row">
+      {game.genres.map((genre) => <span class="genre-chip">{genre}</span>)}
     </div>
-</div>
+    <div class="game-card-meta">
+      <span class="meta-rating">{stars(Math.round(game.average_rating || 0))}</span>
+      <span class="meta-muted">{game.average_rating.toFixed(1)} average</span>
+    </div>
+    <div class="card-footer">
+      <span class="meta-muted">{game.reviews_count} reviews</span>
+      <a class="link-button" href={`/game/${game.id}`}>Open Page</a>
+    </div>
+    <div class="card-footer">
+      {myRating}
+    </div>
+  </div>
+</article>

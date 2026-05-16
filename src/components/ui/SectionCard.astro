@@ -1,0 +1,19 @@
+---
+export interface Props {
+  title: string;
+  subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+---
+
+<div class="section-card">
+  <div class="section-head">
+    <div>
+      <h2>{title}</h2>
+      {subtitle && <p>{subtitle}</p>}
+    </div>
+    <slot name="actions" />
+  </div>
+  <slot />
+</div>
