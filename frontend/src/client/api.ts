@@ -42,11 +42,15 @@ export async function api(path: string, options: ApiOptions = {}): Promise<unkno
     headers.Authorization = `Bearer ${getToken()}`;
   }
 
+  console.log(`[API] ${method} /api${path}`);
+  
   const response = await fetch(`/api${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
+
+  console.log(`[API] Response status: ${response.status}`);
 
   const contentType = response.headers.get("content-type") || "";
   const data = contentType.includes("application/json")

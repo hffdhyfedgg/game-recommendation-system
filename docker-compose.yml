@@ -30,23 +30,9 @@ services:
     frontend:
         build: ./frontend
         ports:
-            - "4321:4321"
-        volumes:
-            - ./frontend:/app
-            - /app/node_modules
-        environment:
-            - NODE_ENV=development
-
-    nginx:
-        build:
-            context: .
-            dockerfile: nginx/Dockerfile
-        container_name: playnext-nginx
-        restart: unless-stopped
+            - "8080:80"
         depends_on:
             - backend
-        ports:
-            - "8080:80"
 
 volumes:
     postgres_data:

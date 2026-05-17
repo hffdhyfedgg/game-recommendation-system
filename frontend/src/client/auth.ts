@@ -46,7 +46,8 @@ loginForm.addEventListener('submit', async (e) => {
     showToast('Welcome back!');
     window.location.href = '/app';
   } catch (err) {
-    showToast((err as Error).message);
+    console.error('Login error:', err);
+    showToast((err as Error).message || 'Login failed. Please try again.');
   }
 });
 
@@ -69,7 +70,8 @@ registerForm.addEventListener('submit', async (e) => {
     showToast('Account created successfully!');
     window.location.href = '/app';
   } catch (err) {
-    showToast((err as Error).message);
+    console.error('Register error:', err);
+    showToast((err as Error).message || 'Registration failed. Please try again.');
   }
 });
 
