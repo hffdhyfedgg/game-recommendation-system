@@ -4,10 +4,9 @@ import Button from '../components/ui/Button.astro';
 import Field from '../components/ui/Field.astro';
 import { getToken } from '../client/api';
 
-// Если токен уже есть, редиректим на /app
-if (getToken()) {
-  return Astro.redirect('/app');
-}
+// Проверка авторизации на клиенте (после загрузки страницы)
+// В SSR-режиме мы не можем использовать localStorage, поэтому редирект выполняется в браузере
+const hasToken = typeof window !== 'undefined' ? getToken() : null;
 ---
 
 <AppLayout pageType="auth" title="PlayNext | Sign In">

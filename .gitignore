@@ -1,18 +1,19 @@
-```gitignore
+```
 # Dependencies
 node_modules/
 
-# Build outputs
+# Build artifacts
 dist/
 build/
-.cache/
+*.js.map
+*.tsbuildinfo
 
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
+*.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
 *.swp
@@ -21,37 +22,13 @@ build/
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Compiled files
-*.o
-*.obj
-*.so
-*.dll
-*.exe
-*.out
-
-# OS files
+# Temp files
+*.tmp
 .DS_Store
 Thumbs.db
-
-# Testing
-.nyc_output/
-coverage/
-junit.xml
-
-# Astro-specific
-.astroturf/
 ```

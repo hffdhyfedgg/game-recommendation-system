@@ -3,9 +3,11 @@ import AppLayout from '../../components/ui/AppLayout.astro';
 import SectionCard from '../../components/ui/SectionCard.astro';
 import Button from '../../components/ui/Button.astro';
 import Field from '../../components/ui/Field.astro';
-import { requireAuth } from '../../client/api';
 
 const { id } = Astro.params;
+
+// Проверка авторизации будет выполнена в клиентском скрипте (game.ts)
+// В SSR-режиме мы не можем использовать localStorage
 ---
 
 <AppLayout pageType="game" title="PlayNext | Game">
