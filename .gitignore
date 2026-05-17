@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 
-=======
 ```gitignore
->>>>>>> parent of ab2bde8 (Merge pull request #2 from hffdhyfedgg/astro-миграция-ошибкиlocalstorage-85e1f)
 # Dependencies
 node_modules/
 
