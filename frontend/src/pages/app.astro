@@ -6,8 +6,8 @@ import Field from '../components/ui/Field.astro';
 import Modal from '../components/ui/Modal.astro';
 import { requireAuth } from '../client/api';
 
-// Проверка авторизации будет выполнена в клиентском скрипте (app.ts)
-// В SSR-режиме мы не можем использовать localStorage
+// Проверка авторизации на сервере (опционально)
+// requireAuth();
 ---
 
 <AppLayout pageType="app" title="PlayNext | App">

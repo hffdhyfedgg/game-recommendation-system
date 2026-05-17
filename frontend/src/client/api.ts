@@ -1,24 +1,14 @@
 const TOKEN_KEY = "playnext_token";
 
-// Эти функции работают только в браузере
 export function getToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
   return localStorage.getItem(TOKEN_KEY);
 }
 
 export function setToken(token: string): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearToken(): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
   localStorage.removeItem(TOKEN_KEY);
 }
 
@@ -29,10 +19,6 @@ export interface ApiOptions {
 }
 
 export async function api(path: string, options: ApiOptions = {}): Promise<unknown> {
-  if (typeof window === 'undefined') {
-    throw new Error('api() can only be called in the browser');
-  }
-  
   const { method = "GET", body, auth = true } = options;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -70,9 +56,6 @@ export async function api(path: string, options: ApiOptions = {}): Promise<unkno
 }
 
 export function requireAuth(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
   if (!getToken()) {
     window.location.href = "/";
     return false;
@@ -81,9 +64,6 @@ export function requireAuth(): boolean {
 }
 
 export function logout(): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
   clearToken();
   window.location.href = "/";
 }
