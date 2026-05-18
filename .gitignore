@@ -36,18 +36,13 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Compiled files
-*.o
-*.obj
-*.so
-*.dll
-*.exe
-*.out
 
 # OS files
 .DS_Store
 Thumbs.db
 
-tmp.md
+tmp*.md
 # Astro-specific
 .astroturf/
+.astro
+.utils/
