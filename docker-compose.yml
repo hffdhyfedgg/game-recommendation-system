@@ -27,22 +27,10 @@ services:
             db:
                 condition: service_healthy
 
-    frontend:
-        build:
-            context: ./frontend
-            dockerfile: Dockerfile.dev
-        ports:
-            - "4321:4321"
-        volumes:
-            - ./frontend:/app
-            - /app/node_modules
-        environment:
-            - NODE_ENV=development
-
     nginx:
         build:
-            context: .
-            dockerfile: nginx/Dockerfile
+            context: ./frontend
+            dockerfile: Dockerfile
         container_name: playnext-nginx
         restart: unless-stopped
         depends_on:

@@ -41,7 +41,7 @@ loginForm.addEventListener('submit', async (e) => {
       body: { email, password },
       auth: false,
     });
-    const token = (data as Record<string, string>).token;
+    const token = (data as Record<string, string>).access_token;
     setToken(token);
     showToast('Welcome back!');
     window.location.href = '/app';
@@ -64,7 +64,7 @@ registerForm.addEventListener('submit', async (e) => {
       body: { username, email, password },
       auth: false,
     });
-    const token = (data as Record<string, string>).token;
+    const token = (data as Record<string, string>).access_token;
     setToken(token);
     showToast('Account created successfully!');
     window.location.href = '/app';
