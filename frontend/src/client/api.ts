@@ -42,31 +42,38 @@ export async function api(path: string, options: ApiOptions = {}): Promise<unkno
     headers.Authorization = `Bearer ${getToken()}`;
   }
 
-  const response = await fetch(`/api${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  try {
+    const response = await fetch(`/api${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-  const contentType = response.headers.get("content-type") || "";
-  const data = contentType.includes("application/json")
-    ? await response.json()
-    : await response.text();
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
 
-  if (!response.ok) {
-    const message = typeof data === "object" && data !== null 
-      ? (data as Record<string, string>).detail || (data as Record<string, string>).message 
-      : data;
-    if (response.status === 401 && auth) {
-      clearToken();
-      if (!window.location.pathname.endsWith("/index.html") && window.location.pathname !== "/" && !window.location.pathname.endsWith("/")) {
-        window.location.href = "/";
+    if (!response.ok) {
+      const message = typeof data === "object" && data !== null 
+        ? (data as Record<string, string>).detail || (data as Record<string, string>).message 
+        : data;
+      if (response.status === 401 && auth) {
+        clearToken();
+        if (!window.location.pathname.endsWith("/index.html") && window.location.pathname !== "/" && !window.location.pathname.endsWith("/")) {
+          window.location.href = "/";
+        }
       }
+      throw new Error(message || "Request failed.");
     }
-    throw new Error(message || "Request failed.");
-  }
 
-  return data;
+    return data;
+  } catch (err) {
+    if (err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('NetworkError'))) {
+      throw new Error('Backend is unavailable. Please try again later.');
+    }
+    throw err;
+  }
 }
 
 export function requireAuth(): boolean {

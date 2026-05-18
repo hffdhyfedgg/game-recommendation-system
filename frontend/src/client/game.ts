@@ -59,12 +59,18 @@ async function loadGame(id: number): Promise<Game> {
 
 // Load reviews
 async function loadReviews(gameId: number): Promise<Review[]> {
-  return api(`/games/${gameId}/reviews`) as Promise<Review[]>;
+  const data = await api(`/games/${gameId}`) as Record<string, unknown>;
+  return (data.reviews as Review[]) || [];
+}
+
+// Submit rating
+async function submitRating(gameId: number, value: number): Promise<void> {
+  await api(`/games/${gameId}/rating`, { method: 'POST', body: { value } });
 }
 
 // Submit review
-async function submitReview(gameId: number, rating: number, text: string): Promise<void> {
-  await api(`/games/${gameId}/reviews`, { method: 'POST', body: { rating, text } });
+async function submitReview(gameId: number, content: string): Promise<void> {
+  await api(`/games/${gameId}/review`, { method: 'POST', body: { content } });
 }
 
 function renderGame(game: Game) {
@@ -149,7 +155,8 @@ reviewForm?.addEventListener('submit', async (e) => {
   const text = formData.get('text') as string;
 
   try {
-    await submitReview(gameId, selectedRating, text);
+    await submitRating(gameId, selectedRating);
+    await submitReview(gameId, text);
     showToast('Review submitted successfully!');
     reviewForm.reset();
     selectedRating = 0;

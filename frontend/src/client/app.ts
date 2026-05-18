@@ -77,19 +77,20 @@ async function loadGenres(): Promise<Genre[]> {
 }
 
 async function loadFavoriteGames(): Promise<Game[]> {
-  return api('/user/favorites') as Promise<Game[]>;
+  const data = await api('/users/me/preferences') as Record<string, unknown>;
+  return (data.favorite_games as Game[]) || [];
 }
 
-async function saveGenres(genreIds: number[]): Promise<void> {
-  await api('/user/genres', { method: 'POST', body: { genre_ids: genreIds } });
+async function saveGenres(genreNames: string[]): Promise<void> {
+  await api('/users/me/preferences', { method: 'PUT', body: { genres: genreNames } });
 }
 
 async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
-  await api('/auth/password', { method: 'PUT', body: { current_password: currentPassword, new_password: newPassword } });
+  await api('/auth/change-password', { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } });
 }
 
 async function deleteAccount(): Promise<void> {
-  await api('/auth/account', { method: 'DELETE' });
+  await api('/auth/me', { method: 'DELETE' });
 }
 
 function renderGames(games: Game[]) {
@@ -106,7 +107,7 @@ function renderGames(games: Game[]) {
   }
 }
 
-function renderGenres(genres: Genre[], userGenres: number[] = []) {
+function renderGenres(genres: Genre[], userGenres: string[] = []) {
   const grid = document.getElementById('genresGrid');
   if (!grid) return;
 
@@ -114,7 +115,7 @@ function renderGenres(genres: Genre[], userGenres: number[] = []) {
     .map(
       (genre) => `
       <label class="genre-option">
-        <input type="checkbox" value="${genre.id}" ${userGenres.includes(genre.id) ? 'checked' : ''} />
+        <input type="checkbox" value="${genre.name}" ${userGenres.includes(genre.name) ? 'checked' : ''} />
         <span>${genre.name}</span>
       </label>
     `
@@ -203,10 +204,10 @@ function renderStats() {
 // Save genres button
 document.getElementById('saveGenresButton')?.addEventListener('click', async () => {
   const checkboxes = document.querySelectorAll('#genresGrid input[type="checkbox"]:checked');
-  const genreIds = Array.from(checkboxes).map((cb) => Number((cb as HTMLInputElement).value));
+  const genreNames = Array.from(checkboxes).map((cb) => (cb as HTMLInputElement).value);
 
   try {
-    await saveGenres(genreIds);
+    await saveGenres(genreNames);
     showToast('Genres saved successfully!');
   } catch (err) {
     showToast((err as Error).message);
